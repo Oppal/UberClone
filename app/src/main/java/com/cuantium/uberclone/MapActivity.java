@@ -28,11 +28,23 @@ import android.widget.TextView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.LocationSource;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 
 public class MapActivity extends ActionBarActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener, LocationSource,
+        LocationListener {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -50,11 +62,24 @@ public class MapActivity extends ActionBarActivity
     private static final String DIALOG_ERROR = "dialog_error";
     // Bool to track whether the app is already resolving an error
     private boolean mResolvingError = false;
+    private boolean needsInit = false;
+    private GoogleMap map;
+    private double latitude;
+    private double longitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+
+        //map = (GoogleMap)getFragmentManager().findFragmentById(R.id.map).getMap();
+        map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
+
+        if (savedInstanceState == null) {
+            needsInit=true;
+        }
+
+        //map.getMapAsync(this);
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
@@ -64,6 +89,7 @@ public class MapActivity extends ActionBarActivity
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
+
         buildGoogleApiClient();
 
     }
@@ -75,14 +101,14 @@ public class MapActivity extends ActionBarActivity
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
-
+        mGoogleApiClient.connect();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         if (!mResolvingError) {  // more about this later
-            mGoogleApiClient.connect();
+            //mGoogleApiClient.connect();
         }
     }
 
@@ -157,8 +183,17 @@ public class MapActivity extends ActionBarActivity
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
         if (mLastLocation != null) {
-            //mLatitudeText.setText(String.valueOf(mLastLocation.getLatitude()));
-            //mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));
+
+            latitude = mLastLocation.getLatitude();
+            longitude = mLastLocation.getLongitude();
+
+            LatLng latLng = new LatLng(latitude, longitude);
+
+            map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+
+            map.animateCamera(CameraUpdateFactory.zoomTo(16));
+            map.addMarker(new MarkerOptions().position(latLng).title("Pick me up here"));
+
             Log.i("msg", "Lat: " + mLastLocation.getLatitude() + " Lon:" + mLastLocation.getLongitude());
         }
     }
@@ -202,6 +237,33 @@ public class MapActivity extends ActionBarActivity
     /* Called from ErrorDialogFragment when the dialog is dismissed. */
     public void onDialogDismissed() {
         mResolvingError = false;
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+
+    }
+
+    @Override
+    public void activate(OnLocationChangedListener onLocationChangedListener) {
+
+    }
+
+    @Override
+    public void deactivate() {
+
+    }
+
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+
+    }
+
+    @Override
+    public void onMapReady(final GoogleMap map) {
+
+
+
     }
 
     /* A fragment to display an error dialog */
