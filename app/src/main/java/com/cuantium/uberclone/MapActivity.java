@@ -33,6 +33,9 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener;
+import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -44,7 +47,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener, LocationSource,
-        LocationListener {
+        LocationListener, OnMapClickListener, OnMarkerDragListener {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -192,7 +195,11 @@ public class MapActivity extends ActionBarActivity
             map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
 
             map.animateCamera(CameraUpdateFactory.zoomTo(16));
-            map.addMarker(new MarkerOptions().position(latLng).title("Pick me up here"));
+            map.addMarker(new MarkerOptions().position(latLng).title("Pick me up here").draggable(true));
+            map.setOnMapClickListener(this);
+            map.setOnMarkerDragListener(this);
+            map.setMyLocationEnabled(true);
+
 
             Log.i("msg", "Lat: " + mLastLocation.getLatitude() + " Lon:" + mLastLocation.getLongitude());
         }
@@ -263,6 +270,25 @@ public class MapActivity extends ActionBarActivity
     public void onMapReady(final GoogleMap map) {
 
 
+    }
+
+    @Override
+    public void onMapClick(LatLng latLng) {
+
+    }
+
+    @Override
+    public void onMarkerDragStart(Marker marker) {
+
+    }
+
+    @Override
+    public void onMarkerDrag(Marker marker) {
+
+    }
+
+    @Override
+    public void onMarkerDragEnd(Marker marker) {
 
     }
 
