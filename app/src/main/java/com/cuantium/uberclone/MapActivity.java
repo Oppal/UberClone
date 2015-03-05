@@ -2,6 +2,8 @@ package com.cuantium.uberclone;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.location.Criteria;
+import android.location.LocationManager;
 import android.support.v4.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -69,6 +71,7 @@ public class MapActivity extends ActionBarActivity
     private GoogleMap map;
     private double latitude;
     private double longitude;
+    private Location location;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +80,11 @@ public class MapActivity extends ActionBarActivity
 
         //map = (GoogleMap)getFragmentManager().findFragmentById(R.id.map).getMap();
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
+
+        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+        String provider = locationManager.getBestProvider(criteria, true);
+        location = locationManager.getLastKnownLocation(provider);
 
         if (savedInstanceState == null) {
             needsInit=true;
@@ -187,8 +195,10 @@ public class MapActivity extends ActionBarActivity
                 mGoogleApiClient);
         if (mLastLocation != null) {
 
-            latitude = mLastLocation.getLatitude();
-            longitude = mLastLocation.getLongitude();
+            //latitude = mLastLocation.getLatitude();
+            //longitude = mLastLocation.getLongitude();
+            latitude = location.getLatitude();
+            longitude = location.getLongitude();
 
             LatLng latLng = new LatLng(latitude, longitude);
 
