@@ -2,49 +2,51 @@ package com.cuantium.uberclone;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.location.Criteria;
-import android.location.LocationManager;
-import android.support.v4.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.location.Criteria;
 import android.location.Location;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
+import android.location.LocationManager;
+import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.content.Context;
-import android.os.Build;
-import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.v4.widget.DrawerLayout;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
-import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener;
 import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import org.json.JSONException;
+
+import java.util.ArrayList;
 
 
 public class MapActivity extends ActionBarActivity
@@ -72,6 +74,9 @@ public class MapActivity extends ActionBarActivity
     private double latitude;
     private double longitude;
     private Location location;
+    //RequestQueue queue = Volley.newRequestQueue(this);
+    //String url ="http://www.google.com";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,8 +107,45 @@ public class MapActivity extends ActionBarActivity
                 (DrawerLayout) findViewById(R.id.drawer_layout));
 
         buildGoogleApiClient();
+        
+        getNearbyUbers();
 
     }
+
+    private void getNearbyUbers() {
+        String lugar;
+        //lugar = "california";
+        lugar = "http://52.10.104.56/user";
+        StringRequest eventfulRequest = new StringRequest(Request.Method.GET,
+                //EventfulContract.getSearchEventsUrl(lugar),
+                lugar,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        //try {
+                        //    ArrayList<Event> eventList = EventfulContract.parseEventsFromString(response);
+                        //    Event randomEvent = eventList.get(1);
+
+
+                        //} catch (JSONException e) {
+                        //    e.printStackTrace();
+                        //}
+                        Log.i("myLog", response);
+                    }
+                },new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //error.printStackTrace();
+                Log.i("myLog", "Eso no funcionó");
+            }
+        });
+
+        VolleyClient.getInstance(this)
+                .addToRequestQueue(eventfulRequest);
+
+    }
+
+
 
     protected synchronized void buildGoogleApiClient() {
         Log.i("myLog", "1");
@@ -195,10 +237,10 @@ public class MapActivity extends ActionBarActivity
                 mGoogleApiClient);
         if (mLastLocation != null) {
 
-            //latitude = mLastLocation.getLatitude();
-            //longitude = mLastLocation.getLongitude();
-            latitude = location.getLatitude();
-            longitude = location.getLongitude();
+            latitude = mLastLocation.getLatitude();
+            longitude = mLastLocation.getLongitude();
+            //latitude = location.getLatitude();
+            //longitude = location.getLongitude();
 
             LatLng latLng = new LatLng(latitude, longitude);
 
@@ -211,7 +253,8 @@ public class MapActivity extends ActionBarActivity
             map.setMyLocationEnabled(true);
 
 
-            Log.i("msg", "Lat: " + mLastLocation.getLatitude() + " Lon:" + mLastLocation.getLongitude());
+            Log.i("myLog", "Lat: " + mLastLocation.getLatitude() + " Lon:" + mLastLocation.getLongitude());
+
         }
     }
 
