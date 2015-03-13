@@ -23,11 +23,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -40,6 +38,7 @@ import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener;
 import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -124,9 +123,17 @@ public class MapActivity extends ActionBarActivity
                     public void onResponse(String response) {
                         try {
                             ArrayList<Driver> driversList = EventfulContract.parseEventsFromString(response);
-                            Driver firstDriver = driversList.get(1);
 
-                            Log.i("myLog", firstDriver.getName());
+                            for (int i = 0; i < driversList.size(); i++) {
+                                Driver driver = driversList.get(i);
+                                LatLng driverpos = new LatLng(driver.latitude,driver.longitude);
+                                map.addMarker(new MarkerOptions()
+                                        .position(driverpos)
+                                        .title(driver.getName())
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.falcon)));
+                                Log.i("myLog", driver.getName());
+                            }
+
                             Log.i("myLog", response);
 
                         } catch (JSONException e) {
@@ -138,7 +145,7 @@ public class MapActivity extends ActionBarActivity
                 },new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                //error.printStackTrace();
+                error.printStackTrace();
                 Log.i("myLog", "Eso no funcionó");
             }
         });
