@@ -115,22 +115,25 @@ public class MapActivity extends ActionBarActivity
     private void getNearbyUbers() {
         String lugar;
         //lugar = "california";
-        lugar = "http://52.10.104.56/user";
+        lugar = "http://52.10.104.56/driver";
         StringRequest eventfulRequest = new StringRequest(Request.Method.GET,
                 //EventfulContract.getSearchEventsUrl(lugar),
                 lugar,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        //try {
-                        //    ArrayList<Event> eventList = EventfulContract.parseEventsFromString(response);
-                        //    Event randomEvent = eventList.get(1);
+                        try {
+                            ArrayList<Driver> driversList = EventfulContract.parseEventsFromString(response);
+                            Driver firstDriver = driversList.get(1);
 
+                            Log.i("myLog", firstDriver.getName());
+                            Log.i("myLog", response);
 
-                        //} catch (JSONException e) {
-                        //    e.printStackTrace();
-                        //}
-                        Log.i("myLog", response);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Log.i("myLog", "that didn't works");
+                        }
+
                     }
                 },new Response.ErrorListener() {
             @Override
