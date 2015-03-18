@@ -107,17 +107,14 @@ public class MapActivity extends ActionBarActivity
 
         buildGoogleApiClient();
         
-        getNearbyUbers();
+
 
     }
 
-    private void getNearbyUbers() {
-        String lugar;
-        //lugar = "california";
-        lugar = "http://52.10.104.56/driver";
+    private void getNearbyUbers(double latitude, double longitude) {
+
         StringRequest eventfulRequest = new StringRequest(Request.Method.GET,
-                //EventfulContract.getSearchEventsUrl(lugar),
-                lugar,
+                EventfulContract.buildSearchDriversUrl(latitude, longitude),
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -126,9 +123,9 @@ public class MapActivity extends ActionBarActivity
 
                             for (int i = 0; i < driversList.size(); i++) {
                                 Driver driver = driversList.get(i);
-                                LatLng driverpos = new LatLng(driver.latitude,driver.longitude);
+                                LatLng driverPos = new LatLng(driver.latitude,driver.longitude);
                                 map.addMarker(new MarkerOptions()
-                                        .position(driverpos)
+                                        .position(driverPos)
                                         .title(driver.getName())
                                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.falcon)));
                                 Log.i("myLog", driver.getName());
@@ -264,6 +261,8 @@ public class MapActivity extends ActionBarActivity
 
 
             Log.i("myLog", "Lat: " + mLastLocation.getLatitude() + " Lon:" + mLastLocation.getLongitude());
+
+            getNearbyUbers(latitude, longitude);
 
         }
     }

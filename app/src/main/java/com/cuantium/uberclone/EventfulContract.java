@@ -13,10 +13,15 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 public class EventfulContract {
-    public static final String BASE_URL = "http://www.eventful.com";
+    public static final String BASE_URL = "http://52.10.104.56/";
     public static final String PATH_JSON = "json";
     public static final String PATH_EVENTS = "events";
     public static final String PATH_SEARCH = "search";
+    public static final String PATH_DRIVER = "driver";
+    public static final String PATH_FIND_DRIVER = "findClosestDrivers";
+
+    public static final String PARAM_LATITUDE = "latitude";
+    public static final String PARAM_LONGITUDE = "longitude";
 
     public static final String URL_EVENTS_SEARCH = "/" + PATH_JSON + "/" + PATH_EVENTS + "/" + PATH_SEARCH;
 
@@ -42,6 +47,21 @@ public class EventfulContract {
                 .appendQueryParameter(EventfulContract.PARAM_LOCATION, location)
                 .appendQueryParameter(EventfulContract.PARAM_DATE, VALUE_THIS_WEEK)
                 .build();
+
+
+
+        return eventUrl.toString();
+    }
+
+    public static String buildSearchDriversUrl (double latitude, double longitude){
+        Uri eventUrl = Uri.parse(EventfulContract.BASE_URL).buildUpon()
+                .appendPath(EventfulContract.PATH_DRIVER)
+                .appendPath(EventfulContract.PATH_FIND_DRIVER)
+                .appendQueryParameter(EventfulContract.PARAM_LATITUDE, String.valueOf(latitude))
+                .appendQueryParameter(EventfulContract.PARAM_LONGITUDE, String.valueOf(longitude))
+                .build();
+
+        Log.i("myLog", "url "+ eventUrl.toString());
 
         return eventUrl.toString();
     }
