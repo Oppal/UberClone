@@ -136,9 +136,9 @@ public class MapActivity extends ActionBarActivity
                                         .title(driver.getName())
                                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.falcon)));
                                 Log.i("myLog1", driver.getName());
-                                getWaitingTime(driverPos, imHere.getPosition());
-                                timefromMe += time;
-                                Log.i("myLog1",driver.getName() + " waiting time: "+timefromMe);
+                                getWaitingTime(driverPos, imHere.getPosition(),i+1);
+                                //timefromMe += time;
+                                //Log.i("myLog1",driver.getName() + " waiting time: "+timefromMe);
                             }
 
                             timefromMe = timefromMe/totalDrivers;
@@ -165,7 +165,7 @@ public class MapActivity extends ActionBarActivity
     }
 
 
-    public void getWaitingTime(LatLng origin, LatLng destination)
+    public void getWaitingTime(LatLng origin, LatLng destination, final int driversNum)
     {
 
         StringRequest eventfulRequest = new StringRequest(Request.Method.GET,
@@ -176,12 +176,11 @@ public class MapActivity extends ActionBarActivity
                         try {
                             Direction direction = DirectionsContract.parseEventsFromString(response);
 
-                            time = direction.getTime();
+                            time += direction.getTime();
 
+                            Log.i("myLog1", "wating time: "+time/driversNum);
 
-
-
-                            Log.i("myLog1", response);
+                            //Log.i("myLog1", response);
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -391,6 +390,7 @@ public class MapActivity extends ActionBarActivity
             wannaBeHere.remove();
         wannaBeHere = map.addMarker(new MarkerOptions().position(latLng).title("I want to be here").draggable(true));
         DirectionsContract.buildDirectionsUrl(imHere.getPosition(),wannaBeHere.getPosition());
+
 
     }
 

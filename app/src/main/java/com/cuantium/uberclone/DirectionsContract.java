@@ -42,7 +42,7 @@ public class DirectionsContract {
                 .build();
 
 
-        Log.i("myLog1", "url: " + directUrl.toString());
+        //Log.i("myLog1", "url: " + directUrl.toString());
         return directUrl.toString();
     }
 
