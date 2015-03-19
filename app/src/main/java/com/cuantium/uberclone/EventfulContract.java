@@ -61,7 +61,7 @@ public class EventfulContract {
                 .appendQueryParameter(EventfulContract.PARAM_LONGITUDE, String.valueOf(longitude))
                 .build();
 
-        Log.i("myLog", "url "+ eventUrl.toString());
+        Log.i("myLog1", "url "+ eventUrl.toString());
 
         return eventUrl.toString();
     }

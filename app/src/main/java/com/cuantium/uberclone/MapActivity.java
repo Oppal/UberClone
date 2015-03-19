@@ -75,6 +75,8 @@ public class MapActivity extends ActionBarActivity
     private Location location;
     private Marker imHere;
     private Marker wannaBeHere;
+    private int time;
+
     //RequestQueue queue = Volley.newRequestQueue(this);
     //String url ="http://www.google.com";
 
@@ -122,22 +124,30 @@ public class MapActivity extends ActionBarActivity
                     public void onResponse(String response) {
                         try {
                             ArrayList<Driver> driversList = EventfulContract.parseEventsFromString(response);
+                            int timefromMe = 0;
+                            int totalDrivers = driversList.size();
+                            time = 0;
 
-                            for (int i = 0; i < driversList.size(); i++) {
+                            for (int i = 0; i < totalDrivers; i++) {
                                 Driver driver = driversList.get(i);
                                 LatLng driverPos = new LatLng(driver.latitude,driver.longitude);
                                 map.addMarker(new MarkerOptions()
                                         .position(driverPos)
                                         .title(driver.getName())
                                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.falcon)));
-                                Log.i("myLog", driver.getName());
+                                Log.i("myLog1", driver.getName());
+                                getWaitingTime(driverPos, imHere.getPosition());
+                                timefromMe += time;
+                                Log.i("myLog1",driver.getName() + " waiting time: "+timefromMe);
                             }
 
-                            Log.i("myLog", response);
+                            timefromMe = timefromMe/totalDrivers;
+                            Log.i("myLog1", response);
+                            Log.i("myLog1", "waiting time: "+timefromMe);
 
                         } catch (JSONException e) {
                             e.printStackTrace();
-                            Log.i("myLog", "that didn't works");
+                            Log.i("myLog1", "that didn't works");
                         }
 
                     }
@@ -145,7 +155,7 @@ public class MapActivity extends ActionBarActivity
             @Override
             public void onErrorResponse(VolleyError error) {
                 error.printStackTrace();
-                Log.i("myLog", "Eso no funcionó");
+                Log.i("myLog1", "Eso no funcionó");
             }
         });
 
@@ -155,9 +165,48 @@ public class MapActivity extends ActionBarActivity
     }
 
 
+    public void getWaitingTime(LatLng origin, LatLng destination)
+    {
+
+        StringRequest eventfulRequest = new StringRequest(Request.Method.GET,
+                DirectionsContract.buildDirectionsUrl(origin, destination),
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            Direction direction = DirectionsContract.parseEventsFromString(response);
+
+                            time = direction.getTime();
+
+
+
+
+                            Log.i("myLog1", response);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Log.i("myLog1", "that didn't works");
+                        }
+
+                    }
+                },new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+                Log.i("myLog1", "That didn´t works");
+            }
+        });
+
+        VolleyClient.getInstance(this)
+                .addToRequestQueue(eventfulRequest);
+
+
+    }
+
+
 
     protected synchronized void buildGoogleApiClient() {
-        Log.i("myLog", "1");
+        //Log.i("myLog1", "1");
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -241,7 +290,7 @@ public class MapActivity extends ActionBarActivity
 
     @Override
     public void onConnected(Bundle connectionHint) {
-        Log.i("myLog", "2");
+        Log.i("myLog1", "2");
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
         if (mLastLocation != null) {
@@ -262,7 +311,7 @@ public class MapActivity extends ActionBarActivity
             map.setMyLocationEnabled(true);
 
 
-            Log.i("myLog", "Lat: " + mLastLocation.getLatitude() + " Lon:" + mLastLocation.getLongitude());
+            Log.i("myLog1", "Lat: " + mLastLocation.getLatitude() + " Lon:" + mLastLocation.getLongitude());
 
             getNearbyUbers(latitude, longitude);
 
@@ -341,6 +390,7 @@ public class MapActivity extends ActionBarActivity
         if(wannaBeHere != null)
             wannaBeHere.remove();
         wannaBeHere = map.addMarker(new MarkerOptions().position(latLng).title("I want to be here").draggable(true));
+        DirectionsContract.buildDirectionsUrl(imHere.getPosition(),wannaBeHere.getPosition());
 
     }
 
