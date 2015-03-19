@@ -73,6 +73,8 @@ public class MapActivity extends ActionBarActivity
     private double latitude;
     private double longitude;
     private Location location;
+    private Marker imHere;
+    private Marker wannaBeHere;
     //RequestQueue queue = Volley.newRequestQueue(this);
     //String url ="http://www.google.com";
 
@@ -254,7 +256,7 @@ public class MapActivity extends ActionBarActivity
             map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
 
             map.animateCamera(CameraUpdateFactory.zoomTo(16));
-            map.addMarker(new MarkerOptions().position(latLng).title("Pick me up here").draggable(true));
+            imHere = map.addMarker(new MarkerOptions().position(latLng).title("Pick me up here").draggable(true));
             map.setOnMapClickListener(this);
             map.setOnMarkerDragListener(this);
             map.setMyLocationEnabled(true);
@@ -336,6 +338,9 @@ public class MapActivity extends ActionBarActivity
 
     @Override
     public void onMapClick(LatLng latLng) {
+        if(wannaBeHere != null)
+            wannaBeHere.remove();
+        wannaBeHere = map.addMarker(new MarkerOptions().position(latLng).title("I want to be here").draggable(true));
 
     }
 
@@ -351,6 +356,13 @@ public class MapActivity extends ActionBarActivity
 
     @Override
     public void onMarkerDragEnd(Marker marker) {
+        if(marker.equals(imHere)) {
+            LatLng pos = marker.getPosition();
+            map.clear();
+            imHere = map.addMarker(new MarkerOptions().position(pos).title("Pick me up here").draggable(true));
+
+            getNearbyUbers(pos.latitude, pos.longitude);
+        }
 
     }
 
